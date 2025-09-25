@@ -91,6 +91,40 @@
             border-color: #667eea;
         }
 
+        .dynamic-inputs {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .subject-item, .faculty-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .faculty-item {
+            grid-template-columns: 1fr 2fr;
+        }
+
+        .subject-item input, .subject-item select,
+        .faculty-item input, .faculty-item textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .faculty-item textarea {
+            height: 60px;
+            resize: vertical;
+        }
+
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -115,6 +149,13 @@
 
         .btn-danger {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin: 0;
         }
 
         .tabs {
@@ -298,6 +339,19 @@
             100% { transform: rotate(360deg); }
         }
 
+        .approved-timetable-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+        }
+
+        .download-section {
+            margin-top: 15px;
+            text-align: center;
+        }
+
         /* Mobile-specific styles */
         @media (max-width: 768px) {
             body {
@@ -361,6 +415,16 @@
                 padding: 14px 20px;
                 font-size: 16px;
                 margin: 8px 0;
+            }
+
+            .subject-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .faculty-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
             }
 
             .timetable {
@@ -558,10 +622,6 @@
                         <div class="card">
                             <h3>📚 Academic Structure</h3>
                             <div class="form-group">
-                                <label for="subjects">Number of Subjects:</label>
-                                <input type="number" id="subjects" min="5" max="100" value="25">
-                            </div>
-                            <div class="form-group">
                                 <label for="max-classes-day">Max Classes per Day:</label>
                                 <input type="number" id="max-classes-day" min="4" max="10" value="8">
                             </div>
@@ -578,7 +638,7 @@
                             <h3>👨‍🏫 Faculty Information</h3>
                             <div class="form-group">
                                 <label for="faculty-count">Number of Faculty:</label>
-                                <input type="number" id="faculty-count" min="5" max="100" value="30">
+                                <input type="number" id="faculty-count" min="1" max="100" value="5" onchange="generateFacultyInputs()">
                             </div>
                             <div class="form-group">
                                 <label for="avg-leaves">Average Leaves per Month:</label>
@@ -588,82 +648,24 @@
                                 <label for="max-load">Max Teaching Hours per Day:</label>
                                 <input type="number" id="max-load" min="4" max="8" value="6">
                             </div>
+                            
+                            <div id="faculty-inputs" class="dynamic-inputs hidden">
+                                <h4>Faculty Details:</h4>
+                                <div id="faculty-list"></div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="card">
                         <h3>📋 Subject Details</h3>
                         <div class="form-group">
-                            <label for="subject-list">Subject Names (one per line):</label>
-                            <textarea id="subject-list" rows="8" placeholder="Mathematics
-Physics
-Chemistry
-Computer Science
-English
-History
-Economics
-Biology">Mathematics
-Physics
-Chemistry
-Computer Science
-English
-History
-Economics
-Biology</textarea>
+                            <label for="subjects-count">Number of Subjects:</label>
+                            <input type="number" id="subjects-count" min="1" max="100" value="8" onchange="generateSubjectInputs()">
                         </div>
-                        <div class="form-group">
-                            <label for="classes-per-week">Classes per Week per Subject:</label>
-                            <input type="number" id="classes-per-week" min="1" max="10" value="4">
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3>📖 Subject Type</h3>
-                        <div class="form-group">
-                            <label for="subject-type-list">Subject Type (Theory/Practical) - one per line, same order as subjects:</label>
-                            <textarea id="subject-type-list" rows="8" placeholder="Theory
-Practical
-Theory
-Practical
-Theory
-Theory
-Practical
-Theory">Theory
-Practical
-Theory
-Practical
-Theory
-Theory
-Practical
-Theory</textarea>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3>👨‍🏫 Faculty Assignment</h3>
-                        <div class="form-group">
-                            <label for="faculty-list">Faculty Names (one per line):</label>
-                            <textarea id="faculty-list" rows="6" placeholder="Dr. Smith
-Dr. Johnson
-Dr. Williams
-Dr. Brown
-Dr. Davis">Dr. Smith
-Dr. Johnson
-Dr. Williams
-Dr. Brown
-Dr. Davis</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="faculty-subjects">Subjects Each Faculty Can Teach (comma separated, line by line matching faculty order):</label>
-                            <textarea id="faculty-subjects" rows="6" placeholder="Mathematics, Physics
-Chemistry, Biology
-Computer Science, English
-History, Economics
-Physics, Chemistry">Mathematics, Physics
-Chemistry, Biology
-Computer Science, English
-History, Economics
-Physics, Chemistry</textarea>
+                        
+                        <div id="subject-inputs" class="dynamic-inputs">
+                            <h4>Subject Configuration:</h4>
+                            <div id="subject-list"></div>
                         </div>
                     </div>
 
@@ -726,6 +728,14 @@ Physics, Chemistry</textarea>
                             <div id="room-stats"></div>
                         </div>
                     </div>
+
+                    <div id="approved-timetable" class="approved-timetable-section hidden">
+                        <h3>✅ Approved Timetable</h3>
+                        <div id="approved-timetable-display"></div>
+                        <div class="download-section">
+                            <button class="btn btn-secondary" onclick="downloadTimetable()">📥 Download as Excel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -736,6 +746,8 @@ Physics, Chemistry</textarea>
         let scheduleData = {};
         let generatedTimetables = [];
         let currentUser = null;
+        let approvedTimetable = null;
+        let labAssignments = {}; // Track lab assignments for subjects
 
         // Authentication
         function login() {
@@ -747,8 +759,74 @@ Physics, Chemistry</textarea>
                 document.getElementById('auth-section').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 showStatus('Login successful!', 'success');
+                generateSubjectInputs(); // Initialize subject inputs
+                generateFacultyInputs(); // Initialize faculty inputs
             } else {
                 showStatus('Invalid credentials. Try admin/admin123', 'error');
+            }
+        }
+
+        // Generate subject input fields dynamically
+        function generateSubjectInputs() {
+            const count = parseInt(document.getElementById('subjects-count').value) || 0;
+            const container = document.getElementById('subject-list');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= count; i++) {
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'subject-item';
+                subjectDiv.innerHTML = `
+                    <input type="text" placeholder="Subject ${i} Name" id="subject-name-${i}" value="">
+                    <select id="subject-type-${i}">
+                        <option value="Theory">Theory</option>
+                        <option value="Practical">Practical</option>
+                    </select>
+                    <input type="number" placeholder="Classes/Week" id="subject-classes-${i}" min="1" max="10" value="4">
+                `;
+                container.appendChild(subjectDiv);
+            }
+
+            // Set default values
+            const defaultSubjects = ['Mathematics', 'Physics', 'Chemistry', 'Computer Science', 'English', 'History', 'Economics', 'Biology'];
+            const defaultTypes = ['Theory', 'Practical', 'Theory', 'Practical', 'Theory', 'Theory', 'Practical', 'Theory'];
+            
+            for (let i = 1; i <= Math.min(count, defaultSubjects.length); i++) {
+                document.getElementById(`subject-name-${i}`).value = defaultSubjects[i-1];
+                document.getElementById(`subject-type-${i}`).value = defaultTypes[i-1];
+            }
+        }
+
+        // Generate faculty input fields dynamically
+        function generateFacultyInputs() {
+            const count = parseInt(document.getElementById('faculty-count').value) || 0;
+            const container = document.getElementById('faculty-list');
+            const inputsDiv = document.getElementById('faculty-inputs');
+            
+            container.innerHTML = '';
+            
+            if (count > 0) {
+                inputsDiv.classList.remove('hidden');
+                
+                for (let i = 1; i <= count; i++) {
+                    const facultyDiv = document.createElement('div');
+                    facultyDiv.className = 'faculty-item';
+                    facultyDiv.innerHTML = `
+                        <input type="text" placeholder="Faculty ${i} Name" id="faculty-name-${i}" value="">
+                        <textarea placeholder="Subjects they can teach (comma separated)" id="faculty-subjects-${i}"></textarea>
+                    `;
+                    container.appendChild(facultyDiv);
+                }
+
+                // Set default values
+                const defaultFaculty = ['Dr. Smith', 'Dr. Johnson', 'Dr. Williams', 'Dr. Brown', 'Dr. Davis'];
+                const defaultSubjects = ['Mathematics, Physics', 'Chemistry, Biology', 'Computer Science, English', 'History, Economics', 'Physics, Chemistry'];
+                
+                for (let i = 1; i <= Math.min(count, defaultFaculty.length); i++) {
+                    document.getElementById(`faculty-name-${i}`).value = defaultFaculty[i-1];
+                    document.getElementById(`faculty-subjects-${i}`).value = defaultSubjects[i-1];
+                }
+            } else {
+                inputsDiv.classList.add('hidden');
             }
         }
 
@@ -768,6 +846,33 @@ Physics, Chemistry</textarea>
 
         // Save configuration data
         function saveData() {
+            const subjectsCount = parseInt(document.getElementById('subjects-count').value) || 0;
+            const facultyCount = parseInt(document.getElementById('faculty-count').value) || 0;
+
+            // Collect subject data
+            let subjects = [];
+            for (let i = 1; i <= subjectsCount; i++) {
+                const name = document.getElementById(`subject-name-${i}`)?.value.trim();
+                const type = document.getElementById(`subject-type-${i}`)?.value;
+                const classes = parseInt(document.getElementById(`subject-classes-${i}`)?.value) || 4;
+                
+                if (name) {
+                    subjects.push({ name, type, classesPerWeek: classes });
+                }
+            }
+
+            // Collect faculty data
+            let faculty = [];
+            for (let i = 1; i <= facultyCount; i++) {
+                const name = document.getElementById(`faculty-name-${i}`)?.value.trim();
+                const subjectsStr = document.getElementById(`faculty-subjects-${i}`)?.value.trim();
+                
+                if (name && subjectsStr) {
+                    const canTeach = subjectsStr.split(',').map(s => s.trim()).filter(s => s);
+                    faculty.push({ name, canTeach });
+                }
+            }
+
             scheduleData = {
                 infrastructure: {
                     classrooms: parseInt(document.getElementById('classrooms').value),
@@ -780,21 +885,18 @@ Physics, Chemistry</textarea>
                     batch_size: parseInt(document.getElementById('batch-size').value)
                 },
                 academic: {
-                    subjects: parseInt(document.getElementById('subjects').value),
                     max_classes_day: parseInt(document.getElementById('max-classes-day').value),
-                    days_week: parseInt(document.getElementById('days-week').value),
-                    classes_per_week: parseInt(document.getElementById('classes-per-week').value)
+                    days_week: parseInt(document.getElementById('days-week').value)
                 },
-                subject_list: document.getElementById('subject-list').value.split('\n').filter(s => s.trim()),
-                subject_types: document.getElementById('subject-type-list').value.split('\n').map(s => s.trim()),
-                faculty_list: document.getElementById('faculty-list').value.split('\n').map(f => f.trim()),
-                faculty_subjects: document.getElementById('faculty-subjects').value.split('\n').map(line => line.split(',').map(s => s.trim())),
+                subjects: subjects,
                 faculty: {
-                    count: parseInt(document.getElementById('faculty-count').value),
+                    count: facultyCount,
                     avg_leaves: parseInt(document.getElementById('avg-leaves').value),
-                    max_load: parseInt(document.getElementById('max-load').value)
+                    max_load: parseInt(document.getElementById('max-load').value),
+                    list: faculty
                 }
             };
+
             window.scrollTo({
                 top: 0,
                 behavior: "smooth"
@@ -819,17 +921,22 @@ Physics, Chemistry</textarea>
             }, 3000);
         }
 
-        // Generate mock timetables for demonstration
+        // Generate mock timetables with improved logic
         function generateMockTimetables() {
-            const subjects = scheduleData.subject_list || ['Math', 'Physics', 'Chemistry', 'CS', 'English'];
-            const subjectTypes = scheduleData.subject_types || subjects.map(() => 'Theory');
-            const facultyList = scheduleData.faculty_list || [];
-            const facultySubjects = scheduleData.faculty_subjects || [];
-
+            const subjects = scheduleData.subjects || [];
+            const faculty = scheduleData.faculty.list || [];
             const timeSlots = ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-1:15', '2:15-3:15', '3:15-4:15'];
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
             generatedTimetables = [];
+            labAssignments = {}; // Reset lab assignments
+
+            // Initialize lab assignments for practical subjects
+            subjects.forEach(subject => {
+                if (subject.type === 'Practical') {
+                    labAssignments[subject.name] = Math.floor(Math.random() * scheduleData.infrastructure.laboratories) + 1;
+                }
+            });
 
             for (let option = 1; option <= 3; option++) {
                 let timetable = {
@@ -839,43 +946,66 @@ Physics, Chemistry</textarea>
                     metrics: {
                         classroom_utilization: Math.floor(Math.random() * 20) + 75,
                         faculty_load_balance: Math.floor(Math.random() * 15) + 80,
-                        conflict_count: Math.floor(Math.random() * 5),
+                        conflict_count: Math.floor(Math.random() * 3),
                         optimization_score: Math.floor(Math.random() * 10) + 85
                     }
                 };
-            
+
+                // Initialize schedule structure
                 days.forEach(day => {
                     timetable.schedule[day] = {};
                     timeSlots.forEach(slot => {
-                        if (Math.random() > 0.3) {
-                            const subjectIndex = Math.floor(Math.random() * subjects.length);
-                            const subject = subjects[subjectIndex];
-                            const type = subjectTypes[subjectIndex];
-                        
-                            const eligibleFaculty = facultyList.filter((f, idx) => facultySubjects[idx] && facultySubjects[idx].includes(subject));
-                            const faculty = eligibleFaculty.length > 0 
+                        timetable.schedule[day][slot] = null;
+                    });
+                });
+
+                // Track used time slots to prevent conflicts
+                let usedSlots = new Set();
+
+                // Schedule classes for each subject
+                subjects.forEach(subject => {
+                    let classesScheduled = 0;
+                    let attempts = 0;
+                    const maxAttempts = 50;
+
+                    while (classesScheduled < subject.classesPerWeek && attempts < maxAttempts) {
+                        const day = days[Math.floor(Math.random() * days.length)];
+                        const slot = timeSlots[Math.floor(Math.random() * timeSlots.length)];
+                        const slotKey = `${day}-${slot}`;
+
+                        // Check if slot is available and no conflict with same subject
+                        if (!timetable.schedule[day][slot] && !usedSlots.has(`${subject.name}-${day}-${slot}`)) {
+                            // Find eligible faculty
+                            const eligibleFaculty = faculty.filter(f => f.canTeach.includes(subject.name));
+                            const selectedFaculty = eligibleFaculty.length > 0 
                                 ? eligibleFaculty[Math.floor(Math.random() * eligibleFaculty.length)]
-                                : 'Dr. Default';
-                        
+                                : { name: 'Dr. Default' };
+
+                            // Assign room based on subject type
                             let room = '';
-                            if (type && type.toLowerCase() === 'practical') {
-                                room = `Lab ${Math.floor(Math.random() * scheduleData.infrastructure.laboratories) + 1}`;
+                            if (subject.type === 'Practical') {
+                                room = `Lab ${labAssignments[subject.name]}`;
                             } else {
                                 room = `Room ${Math.floor(Math.random() * scheduleData.infrastructure.classrooms) + 1}`;
                             }
-                        
+
                             const batch = `Batch ${Math.floor(Math.random() * scheduleData.students.batches) + 1}`;
-                        
+
                             timetable.schedule[day][slot] = {
-                                subject: subject,
+                                subject: subject.name,
+                                type: subject.type,
                                 room: room,
                                 batch: batch,
-                                faculty: faculty
+                                faculty: selectedFaculty.name
                             };
+
+                            usedSlots.add(`${subject.name}-${day}-${slot}`);
+                            classesScheduled++;
                         }
-                    });
+                        attempts++;
+                    }
                 });
-            
+
                 generatedTimetables.push(timetable);
             }
         }
@@ -895,9 +1025,9 @@ Physics, Chemistry</textarea>
             `;
             
             const suggestions = [
-                "Consider adding one more classroom for better utilization",
-                "Faculty workload is well-balanced across all options", 
-                "Lab sessions are optimally distributed",
+                "Lab assignments are consistent for practical subjects",
+                "No simultaneous classes for same subjects detected", 
+                "Faculty workload is well-balanced across all options",
                 "Break timings are well-coordinated"
             ];
             
@@ -927,11 +1057,11 @@ Physics, Chemistry</textarea>
             }
             
             const timetable = generatedTimetables.find(tt => tt.id === selectedId);
-            displayTimetable(timetable);
+            displayTimetable(timetable, 'timetable-display');
         }
 
         // Display timetable
-        function displayTimetable(timetable) {
+        function displayTimetable(timetable, containerId) {
             const timeSlots = ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-1:15', '2:15-3:15', '3:15-4:15'];
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             
@@ -953,9 +1083,7 @@ Physics, Chemistry</textarea>
                     const classInfo = timetable.schedule[day][slot];
 
                     if (classInfo) {
-                        const subjectIndex = scheduleData.subject_list.indexOf(classInfo.subject);
-                        const type = scheduleData.subject_types[subjectIndex] || 'Theory';
-                        const classTypeClass = type.toLowerCase() === 'practical' ? 'practical' : '';
+                        const classTypeClass = classInfo.type === 'Practical' ? 'practical' : '';
 
                         html += `<td>
                             <div class="class-slot ${classTypeClass}">
@@ -974,8 +1102,8 @@ Physics, Chemistry</textarea>
             
             html += '</tbody></table>';
             
-            document.getElementById('timetable-display').innerHTML = html;
-            document.getElementById('timetable-display').classList.remove('hidden');
+            document.getElementById(containerId).innerHTML = html;
+            document.getElementById(containerId).classList.remove('hidden');
         }
 
         // Approve timetable
@@ -986,8 +1114,19 @@ Physics, Chemistry</textarea>
                 return;
             }
             
+            approvedTimetable = generatedTimetables.find(tt => tt.id === selectedId);
             showStatus('Timetable approved and finalized successfully!', 'success');
             generateReports();
+            showApprovedTimetable();
+        }
+
+        // Show approved timetable in reports
+        function showApprovedTimetable() {
+            if (approvedTimetable) {
+                const approvedSection = document.getElementById('approved-timetable');
+                approvedSection.classList.remove('hidden');
+                displayTimetable(approvedTimetable, 'approved-timetable-display');
+            }
         }
 
         // Generate reports
@@ -1003,14 +1142,24 @@ Physics, Chemistry</textarea>
             `;
             
             // Faculty stats
-            document.getElementById('faculty-stats').innerHTML = `
-                <div class="data-list">
+            const facultyList = scheduleData.faculty?.list || [];
+            let facultyStatsHtml = '<div class="data-list">';
+            
+            if (facultyList.length > 0) {
+                facultyList.forEach((faculty, index) => {
+                    const hours = (4 + Math.random() * 3).toFixed(1);
+                    facultyStatsHtml += `<div class="data-item"><span>${faculty.name}</span><span>${hours} hrs/day</span></div>`;
+                });
+            } else {
+                facultyStatsHtml += `
                     <div class="data-item"><span>Average Teaching Hours</span><span>5.2/day</span></div>
                     <div class="data-item"><span>Workload Distribution</span><span>Balanced</span></div>
                     <div class="data-item"><span>Faculty Satisfaction</span><span>89%</span></div>
-                    <div class="data-item"><span>Leave Accommodation</span><span>100%</span></div>
-                </div>
-            `;
+                `;
+            }
+            
+            facultyStatsHtml += '</div>';
+            document.getElementById('faculty-stats').innerHTML = facultyStatsHtml;
             
             // Room stats
             document.getElementById('room-stats').innerHTML = `
@@ -1021,6 +1170,48 @@ Physics, Chemistry</textarea>
                     <div class="data-item"><span>Capacity Optimization</span><span>93%</span></div>
                 </div>
             `;
+        }
+
+        // Download timetable as Excel
+        function downloadTimetable() {
+            if (!approvedTimetable) {
+                showStatus('No approved timetable to download!', 'error');
+                return;
+            }
+
+            // Create CSV content
+            const timeSlots = ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-1:15', '2:15-3:15', '3:15-4:15'];
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            let csvContent = 'Time,' + days.join(',') + '\n';
+            
+            timeSlots.forEach(slot => {
+                let row = slot;
+                days.forEach(day => {
+                    const classInfo = approvedTimetable.schedule[day][slot];
+                    if (classInfo) {
+                        row += ',"' + classInfo.subject + ' - ' + classInfo.room + ' - ' + classInfo.batch + ' - ' + classInfo.faculty + '"';
+                    } else {
+                        row += ',"Free"';
+                    }
+                });
+                csvContent += row + '\n';
+            });
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `${approvedTimetable.name.replace(/\s+/g, '_')}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showStatus('Timetable downloaded successfully!', 'success');
+            }
         }
 
         // Utility function to show status messages
