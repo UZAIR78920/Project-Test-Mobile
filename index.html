@@ -120,9 +120,20 @@
             font-size: 14px;
         }
 
-        .faculty-item textarea {
-            height: 60px;
-            resize: vertical;
+        .time-slot-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: end;
+        }
+
+        .time-slot-item input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
         }
 
         .btn {
@@ -339,13 +350,56 @@
             100% { transform: rotate(360deg); }
         }
 
+        .approved-timetable-section table {
+            width: 100%;
+            min-width: 700px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .approved-timetable-section th, .approved-timetable-section td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #e1e5e9;
+            font-size: 12px;
+        }
+
+        .approved-timetable-section th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .approved-timetable-section td {
+            background: #f8f9fa;
+        }
+
+
         .approved-timetable-section {
             margin-top: 20px;
             padding: 20px;
             background: #e8f5e8;
             border-radius: 10px;
             border-left: 5px solid #28a745;
+            overflow-x: auto;
         }
+
+        .approved-timetable-section::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .approved-timetable-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .approved-timetable-section::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+
 
         .download-section {
             margin-top: 15px;
@@ -423,6 +477,11 @@
             }
 
             .faculty-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .time-slot-item {
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
@@ -622,15 +681,20 @@
                         <div class="card">
                             <h3>📚 Academic Structure</h3>
                             <div class="form-group">
-                                <label for="max-classes-day">Max Classes per Day:</label>
-                                <input type="number" id="max-classes-day" min="4" max="10" value="8">
-                            </div>
-                            <div class="form-group">
                                 <label for="days-week">Working Days per Week:</label>
                                 <select id="days-week">
                                     <option value="5">5 Days</option>
                                     <option value="6" selected>6 Days</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="time-slots-count">Number of Time Slots per Day:</label>
+                                <input type="number" id="time-slots-count" min="4" max="12" value="6" onchange="generateTimeSlotInputs()">
+                            </div>
+                            
+                            <div id="time-slot-inputs" class="dynamic-inputs">
+                                <h4>Time Slot Configuration:</h4>
+                                <div id="time-slot-list"></div>
                             </div>
                         </div>
 
@@ -761,6 +825,7 @@
                 showStatus('Login successful!', 'success');
                 generateSubjectInputs(); // Initialize subject inputs
                 generateFacultyInputs(); // Initialize faculty inputs
+                generateTimeSlotInputs(); // Initialize time slot inputs
             } else {
                 showStatus('Invalid credentials. Try admin/admin123', 'error');
             }
@@ -776,15 +841,22 @@
                 const subjectDiv = document.createElement('div');
                 subjectDiv.className = 'subject-item';
                 subjectDiv.innerHTML = `
-                    <input type="text" placeholder="Subject ${i} Name" id="subject-name-${i}" value="">
+                    <label><strong>Subject ${i}</strong></label><br>
+                    <label for="subject-name-${i}">Subject Name:</label>
+                    <input type="text" id="subject-name-${i}" value=""><br>
+
+                    <label for="subject-type-${i}">Type:</label>
                     <select id="subject-type-${i}">
                         <option value="Theory">Theory</option>
                         <option value="Practical">Practical</option>
-                    </select>
-                    <input type="number" placeholder="Classes/Week" id="subject-classes-${i}" min="1" max="10" value="4">
+                    </select><br>
+
+                    <label for="subject-classes-${i}">Hours per Week:</label>
+                    <input type="number" id="subject-classes-${i}" min="1" max="10" value="4">
                 `;
                 container.appendChild(subjectDiv);
             }
+
 
             // Set default values
             const defaultSubjects = ['Mathematics', 'Physics', 'Chemistry', 'Computer Science', 'English', 'History', 'Economics', 'Biology'];
@@ -796,7 +868,40 @@
             }
         }
 
-        // Generate faculty input fields dynamically
+        // Generate time slot input fields dynamically
+        function generateTimeSlotInputs() {
+            const count = parseInt(document.getElementById('time-slots-count').value) || 0;
+            const container = document.getElementById('time-slot-list');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= count; i++) {
+                const timeSlotDiv = document.createElement('div');
+                timeSlotDiv.className = 'time-slot-item';
+                timeSlotDiv.innerHTML = `
+                    <label><strong>Slot ${i}</strong></label><br>
+                    <label for="time-slot-start-${i}">Start:</label>
+                    <input type="time" id="time-slot-start-${i}" value="">
+                    <label for="time-slot-end-${i}">End:</label>
+                    <input type="time" id="time-slot-end-${i}" value="">
+                `;
+                container.appendChild(timeSlotDiv);
+            }
+
+            // Set default time slots
+            const defaultTimeSlots = [
+                { start: '09:00', end: '10:00' },
+                { start: '10:00', end: '11:00' },
+                { start: '11:15', end: '12:15' },
+                { start: '12:15', end: '13:15' },
+                { start: '14:15', end: '15:15' },
+                { start: '15:15', end: '16:15' }
+            ];
+
+            for (let i = 1; i <= Math.min(count, defaultTimeSlots.length); i++) {
+                document.getElementById(`time-slot-start-${i}`).value = defaultTimeSlots[i-1].start;
+                document.getElementById(`time-slot-end-${i}`).value = defaultTimeSlots[i-1].end;
+            }
+        }
         function generateFacultyInputs() {
             const count = parseInt(document.getElementById('faculty-count').value) || 0;
             const container = document.getElementById('faculty-list');
@@ -811,11 +916,16 @@
                     const facultyDiv = document.createElement('div');
                     facultyDiv.className = 'faculty-item';
                     facultyDiv.innerHTML = `
-                        <input type="text" placeholder="Faculty ${i} Name" id="faculty-name-${i}" value="">
-                        <textarea placeholder="Subjects they can teach (comma separated)" id="faculty-subjects-${i}"></textarea>
+                        <label><strong>Faculty ${i}</strong></label><br>
+                        <label for="faculty-name-${i}">Faculty Name:</label>
+                        <input type="text" id="faculty-name-${i}" value=""><br>
+                                
+                        <label for="faculty-subjects-${i}">Subjects:</label>
+                        <textarea id="faculty-subjects-${i}" placeholder="Comma separated"></textarea>
                     `;
                     container.appendChild(facultyDiv);
                 }
+
 
                 // Set default values
                 const defaultFaculty = ['Dr. Smith', 'Dr. Johnson', 'Dr. Williams', 'Dr. Brown', 'Dr. Davis'];
@@ -848,6 +958,7 @@
         function saveData() {
             const subjectsCount = parseInt(document.getElementById('subjects-count').value) || 0;
             const facultyCount = parseInt(document.getElementById('faculty-count').value) || 0;
+            const timeSlotsCount = parseInt(document.getElementById('time-slots-count').value) || 0;
 
             // Collect subject data
             let subjects = [];
@@ -873,6 +984,17 @@
                 }
             }
 
+            // Collect time slots data
+            let timeSlots = [];
+            for (let i = 1; i <= timeSlotsCount; i++) {
+                const start = document.getElementById(`time-slot-start-${i}`)?.value;
+                const end = document.getElementById(`time-slot-end-${i}`)?.value;
+                
+                if (start && end) {
+                    timeSlots.push(`${start}-${end}`);
+                }
+            }
+
             scheduleData = {
                 infrastructure: {
                     classrooms: parseInt(document.getElementById('classrooms').value),
@@ -885,8 +1007,8 @@
                     batch_size: parseInt(document.getElementById('batch-size').value)
                 },
                 academic: {
-                    max_classes_day: parseInt(document.getElementById('max-classes-day').value),
-                    days_week: parseInt(document.getElementById('days-week').value)
+                    days_week: parseInt(document.getElementById('days-week').value),
+                    time_slots: timeSlots
                 },
                 subjects: subjects,
                 faculty: {
@@ -925,8 +1047,9 @@
         function generateMockTimetables() {
             const subjects = scheduleData.subjects || [];
             const faculty = scheduleData.faculty.list || [];
-            const timeSlots = ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-1:15', '2:15-3:15', '3:15-4:15'];
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const timeSlots = scheduleData.academic.time_slots || ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-13:15', '14:15-15:15', '15:15-16:15'];
+            const daysWeek = scheduleData.academic.days_week || 6;
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].slice(0, daysWeek);
 
             generatedTimetables = [];
             labAssignments = {}; // Reset lab assignments
@@ -1062,8 +1185,9 @@
 
         // Display timetable
         function displayTimetable(timetable, containerId) {
-            const timeSlots = ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-1:15', '2:15-3:15', '3:15-4:15'];
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const timeSlots = scheduleData.academic?.time_slots || ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-13:15', '14:15-15:15', '15:15-16:15'];
+            const daysWeek = scheduleData.academic?.days_week || 6;
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].slice(0, daysWeek);
             
             let html = `
                 <h3>${timetable.name}</h3>
@@ -1080,7 +1204,7 @@
             timeSlots.forEach(slot => {
                 html += `<tr><td><strong>${slot}</strong></td>`;
                 days.forEach(day => {
-                    const classInfo = timetable.schedule[day][slot];
+                    const classInfo = timetable.schedule[day] && timetable.schedule[day][slot];
 
                     if (classInfo) {
                         const classTypeClass = classInfo.type === 'Practical' ? 'practical' : '';
@@ -1115,6 +1239,10 @@
             }
             
             approvedTimetable = generatedTimetables.find(tt => tt.id === selectedId);
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
             showStatus('Timetable approved and finalized successfully!', 'success');
             generateReports();
             showApprovedTimetable();
@@ -1180,15 +1308,16 @@
             }
 
             // Create CSV content
-            const timeSlots = ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-1:15', '2:15-3:15', '3:15-4:15'];
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const timeSlots = scheduleData.academic?.time_slots || ['9:00-10:00', '10:00-11:00', '11:15-12:15', '12:15-13:15', '14:15-15:15', '15:15-16:15'];
+            const daysWeek = scheduleData.academic?.days_week || 6;
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].slice(0, daysWeek);
             
             let csvContent = 'Time,' + days.join(',') + '\n';
             
             timeSlots.forEach(slot => {
                 let row = slot;
                 days.forEach(day => {
-                    const classInfo = approvedTimetable.schedule[day][slot];
+                    const classInfo = approvedTimetable.schedule[day] && approvedTimetable.schedule[day][slot];
                     if (classInfo) {
                         row += ',"' + classInfo.subject + ' - ' + classInfo.room + ' - ' + classInfo.batch + ' - ' + classInfo.faculty + '"';
                     } else {
