@@ -704,14 +704,14 @@
                     <h2>Administrative Access</h2>
                     <div class="form-group">
                         <label for="username">Username:</label>
-                        <input type="text" id="username" placeholder="Enter username" value="admin">
+                        <input type="text" id="username" placeholder="Enter username">
                     </div>
                     <div class="form-group">
                         <label for="password">Password:</label>
-                        <input type="password" id="password" placeholder="Enter password" value="admin123">
+                        <input type="password" id="password" placeholder="Enter password">
                     </div>
                     <button class="btn" onclick="login()">Login</button>
-                    <p style="margin-top: 10px; font-size: 12px; color: #666;">Default: admin / admin123</p>
+                    <p style="margin-top: 10px; font-size: 12px; color: #666;"></p>
                 </div>
             </div>
 
@@ -913,7 +913,7 @@
                 showStatus('🎉 Login successful! Welcome to Smart Class Scheduler', 'success');
                 initializeDefaultData();
             } else {
-                showStatus('❌ Invalid credentials. Please use: admin / admin123', 'error');
+                showStatus('❌ Invalid credentials. Please Try Again', 'error');
             }
         }
 
