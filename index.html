@@ -711,7 +711,8 @@
                         <input type="password" id="password" placeholder="Enter password">
                     </div>
                     <button class="btn" onclick="login()">Login</button>
-                    <p style="margin-top: 10px; font-size: 12px; color: #666;"></p>
+            <div id="login-error" class="hidden" style="margin-top: 15px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 6px; font-size: 14px; text-align: center;"></div>
+            <p style="margin-top: 10px; font-size: 12px; color: #666;"></p>
                 </div>
             </div>
 
@@ -890,7 +891,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // Enhanced data storage and management
         let scheduleData = {};
@@ -905,7 +905,12 @@
         function login() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            
+            const errorDiv = document.getElementById('login-error');
+
+            // Clear any existing error message
+            errorDiv.classList.add('hidden');
+            errorDiv.innerHTML = '';
+
             if (username === 'admin' && password === 'admin123') {
                 currentUser = username;
                 document.getElementById('auth-section').classList.add('hidden');
@@ -913,7 +918,19 @@
                 showStatus('🎉 Login successful! Welcome to Smart Class Scheduler', 'success');
                 initializeDefaultData();
             } else {
-                showStatus('❌ Invalid credentials. Please Try Again', 'error');
+                // Show error message in the login form
+                errorDiv.innerHTML = '❌ Invalid credentials. Please try again.';
+                errorDiv.classList.remove('hidden');
+
+                // Clear the password field for security
+                document.getElementById('password').value = '';
+
+                // Add shake animation to the form
+                const loginForm = document.querySelector('.login-form');
+                loginForm.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    loginForm.style.animation = '';
+                }, 500);
             }
         }
 
@@ -1869,6 +1886,11 @@
             @keyframes fadeOut {
                 from { opacity: 1; }
                 to { opacity: 0; }
+            }
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
             }
             .status-message {
                 animation: fadeInUp 0.3s ease;
